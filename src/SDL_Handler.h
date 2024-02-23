@@ -1,6 +1,6 @@
 #pragma once
 #include <SDL.h>
-#include <SDL_Image.h>
+#include <SDL_image.h>
 #include <stdio.h>
 #include <string>
 
@@ -32,6 +32,8 @@ public:
 	// cleans up SDL stuff
 	void cleanUp();
 
+	// const
+	SDL_Handler();
 	// destructor
 	~SDL_Handler();
 

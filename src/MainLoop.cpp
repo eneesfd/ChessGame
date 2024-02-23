@@ -4,14 +4,15 @@
 #include "SDL_Handler.h"
 #include "Game.h"
 
+#include <memory>
+
 void MainLoop::run()
 {
-	SDL_Handler* handler = new SDL_Handler();
-	handler->init();
+	SDL_Handler handler;
 
-	handler->renderBackground();
+	handler.renderBackground();
 
-	Game* game = new Game(handler);
+	std::unique_ptr<Game> game = std::make_unique<Game>(&handler);
 	bool quit = false;
 
 	int xStart = -1;
@@ -20,19 +21,19 @@ void MainLoop::run()
 	int yEnd = -1;
 	Piece* clickedOn = nullptr;
 
-	while (quit == false)
+	while (!quit)
 	{
-		while (SDL_PollEvent(&handler->m_event))
+		while (SDL_WaitEvent(&handler.m_event))
 		{
-			if (handler->m_event.type == SDL_QUIT)
+			if (handler.m_event.type == SDL_QUIT)
 			{
 				quit = true;
 			}
 
-			if (handler->m_event.type == SDL_MOUSEBUTTONDOWN)
+			if (handler.m_event.type == SDL_MOUSEBUTTONDOWN)
 			{
-				xStart = handler->m_event.button.x / 80;
-				yStart = handler->m_event.button.y / 80;
+				xStart = handler.m_event.button.x / 80;
+				yStart = handler.m_event.button.y / 80;
 				clickedOn = game->getFieldPos(xStart, yStart);
 				if (clickedOn != nullptr)
 				{
@@ -43,7 +44,7 @@ void MainLoop::run()
 				}
 			}
 
-			if (handler->m_event.type == SDL_MOUSEBUTTONUP)
+			if (handler.m_event.type == SDL_MOUSEBUTTONUP)
 			{
 				if (clickedOn != nullptr)
 				{
@@ -52,8 +53,8 @@ void MainLoop::run()
 						game->undoRenderPossibleMoves(clickedOn);
 					}
 				}
-				xEnd = handler->m_event.button.x / 80;
-				yEnd = handler->m_event.button.y / 80;
+				xEnd = handler.m_event.button.x / 80;
+				yEnd = handler.m_event.button.y / 80;
 				if (clickedOn != nullptr)
 				{
 					if ((xStart != -1 && yStart != -1 && xEnd != -1 && yEnd != -1)
@@ -78,6 +79,4 @@ void MainLoop::run()
 			}
 		}
 	}
-
-	handler->cleanUp();
 }
